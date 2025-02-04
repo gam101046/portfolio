@@ -1,0 +1,149 @@
+# %%
+
+import numpy as np
+import pandas as pd
+import os
+import librosa
+import torchaudio
+
+# %%
+BASE_DIR  = '/Users/gam/Desktop/DEEP/FINAL/archive-2/VCTK-Corpus/VCTK-Corpus'
+TXT_DIR =  os.path.join(BASE_DIR, 'txt')
+AUDIO_DIR = os.path.join(BASE_DIR, 'wav48')
+
+SAMPLING_RATE = 22050
+MAX_DURATION = 8
+SR_DOWNSAMPLE = 2
+LOAD_CHECKPOINT = False
+
+# %%
+
+
+# %%
+speaker_ids = sorted(os.listdir(TXT_DIR))
+print('number of speakers is', len(speaker_ids))
+
+# %%
+
+def get_speech(speaker_id = np.random.choice(speaker_ids), passage_id = None):
+    if not passage_id:
+        speaker_passage_path = os.path.join(TXT_DIR, speaker_id)
+        passage_id = np.random.choice(os.listdir(speaker_passage_path))[:-4]
+        
+    text_path = os.path.join(TXT_DIR, speaker_id, passage_id + '.txt')
+    speech_path = os.path.join(AUDIO_DIR, speaker_id, passage_id + '.wav')
+    
+    x, sr = librosa.load(speech_path)
+    
+    with open(text_path, 'r') as text_file:
+        text = text_file.read()
+        
+    return x, sr, text, speech_path
+        
+        
+x, sr, text, speech_path = get_speech()
+print('sampling rate', sr, 'hz')
+print('number of samples', len(x))
+print('duration', round(len(x)/sr, 2), 'seconds')
+
+# %%
+import IPython.display as ipd
+print(text)
+ipd.Audio(speech_path)
+
+# %%
+def extract_mel_spectrogram(x, sr, max_duration=MAX_DURATION, sr_downsample=SR_DOWNSAMPLE):
+    # ตรวจสอบความยาวของเสียง
+    max_samples = int(max_duration * sr)  # จำนวน sample สูงสุดที่อนุญาต
+    if len(x) > max_samples:
+        x = x[:max_samples]  # ตัดเสียงให้มีความยาวตามที่กำหนด
+    x_resampled = librosa.resample(x, sr, sr // sr_downsample)  # ทำการ resample ถ้าจำเป็น
+
+    # สร้าง Mel-spectrogram
+    mel_spectrogram = librosa.feature.melspectrogram(x_resampled, sr=sr // sr_downsample, n_mels=128, fmax=8000)
+    mel_spectrogram = librosa.power_to_db(mel_spectrogram, ref=np.max)  # เปลี่ยนเป็น dB scale
+
+    return mel_spectrogram
+
+
+# %%
+def text_to_sequence(text):
+    # แปลงข้อความเป็นลำดับของตัวอักษร (สามารถใช้ตัว encoding ที่เหมาะสม)
+    char_to_int = {ch: i for i, ch in enumerate("abcdefghijklmnopqrstuvwxyz' ")}
+
+    # แปลงข้อความเป็นลำดับตัวเลข
+    return [char_to_int[char] for char in text.lower() if char in char_to_int]
+
+
+# %%
+import torch
+import torch.nn as nn
+
+class SpeechToTextRNN(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size, num_layers=2):
+        super(SpeechToTextRNN, self).__init__()
+        
+        # LSTM layers
+        self.rnn = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
+        
+        # Fully connected layer for output (mapping to characters)
+        self.fc = nn.Linear(hidden_size, output_size)
+        
+    def forward(self, x):
+        # x: input shape (batch_size, sequence_length, input_size)
+        lstm_out, _ = self.rnn(x)
+        output = self.fc(lstm_out)
+        return output
+
+
+# %%
+import torch.optim as optim
+from torch.utils.data import DataLoader, Dataset
+
+class SpeechDataset(Dataset):
+    def __init__(self, audio_paths, text_paths, sr, max_duration):
+        self.audio_paths = audio_paths
+        self.text_paths = text_paths
+        self.sr = sr
+        self.max_duration = max_duration
+        
+    def __len__(self):
+        return len(self.audio_paths)
+    
+    def __getitem__(self, idx):
+        # ดึงข้อมูลจากไฟล์
+        x, sr, text, speech_path = get_speech(self.audio_paths[idx], self.text_paths[idx]) 
+        mel_spectrogram = extract_mel_spectrogram(x, sr, self.max_duration)
+        text_sequence = text_to_sequence(text)
+        
+        return torch.tensor(mel_spectrogram).float(), torch.tensor(text_sequence).long()
+
+# สร้าง dataset และ dataloader
+dataset = SpeechDataset(audio_paths, text_paths, SAMPLING_RATE, MAX_DURATION)
+dataloader = DataLoader(dataset, batch_size=16, shuffle=True)
+
+# สร้างโมเดล
+model = SpeechToTextRNN(input_size=128, hidden_size=256, output_size=30)  # สมมติว่ามี 30 ตัวอักษร
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+criterion = nn.CrossEntropyLoss()
+
+num_epochs = 10
+# ฝึกโมเดล
+for epoch in range(num_epochs):
+    for inputs, targets in dataloader:
+        optimizer.zero_grad()
+        
+        # ทำ forward pass
+        outputs = model(inputs)
+        
+        # คำนวณ loss
+        loss = criterion(outputs.view(-1, outputs.shape[-1]), targets.view(-1))
+        
+        # ทำการ backpropagation
+        loss.backward()
+        optimizer.step()
+        
+    print(f'Epoch {epoch+1}/{num_epochs}, Loss: {loss.item()}')
+
+
+
