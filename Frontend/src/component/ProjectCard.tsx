@@ -14,7 +14,7 @@ const ProjectCard: React.FC<Props> = ({ project, onClick }) => (
 >
     <div className="relative h-48 bg-gray-100 overflow-hidden">
     <img
-        src={project.image}
+        src={project.image[0]}
         alt={project.title}
         className="w-full h-full object-cover group-hover:scale-105 transition-transform"
     />
