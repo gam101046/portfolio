@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import type { Project } from "./../../data/projects";
 import { projects } from "./../../data/projects";
 import  Header  from "../../component/Header";
