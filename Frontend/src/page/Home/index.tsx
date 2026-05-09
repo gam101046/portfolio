@@ -7,6 +7,7 @@ import  Filter from "../../component/Filter";
 import ProjectsGrid from "../../component/ProjectsGrid";
 import ProjectModal from "../../component/ProjectModel";
 import { Footer } from "../../component/Footer";
+import Acvitive from "../../component/acvitive";
 
 const App = () => {
     const [selectedCategory, setSelectedCategory] = useState("all");
@@ -20,6 +21,7 @@ return (
     {selectedProject && <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />}
     <Header />
     <Hero />
+    <Acvitive />
     <Filter tags={allTags} selected={selectedCategory} onSelect={setSelectedCategory} />
     <ProjectsGrid projects={filtered} onSelect={setSelectedProject} />
     <Footer />

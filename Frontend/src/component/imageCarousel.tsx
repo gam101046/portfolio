@@ -40,8 +40,9 @@ return (
         <img
         src={images[currentIndex].url}
         alt={images[currentIndex].title ?? `Slide ${currentIndex + 1}`}
-        className="w-full h-72 md:h-95 object-cover transition-opacity duration-300"
+        className="w-full h-65 md:h-55  lg:h-65 object-contain transition-opacity duration-300"
         />
+
 
         {/* overlay title */}
         {images[currentIndex].title && (

@@ -5,6 +5,7 @@ interface FilterProps {
 }
 const Filter: React.FC<FilterProps> = ({ tags, selected, onSelect }) => (
 <section className="max-w-6xl mx-auto px-6 py-8 border-t border-gray-200">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">ประวัติการเข้าร่วมกิจกรรม</h1>
     <div className="flex flex-wrap gap-3">
     <button
         onClick={() => onSelect("all")}

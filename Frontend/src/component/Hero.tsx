@@ -2,14 +2,14 @@ import Profile from '../assets/ดีไซน์ที่ยังไม่ไ�
 
 const Hero = () => (
 <section className="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-8">
-    <div className="flex flex-col md:flex-row  gap-6">
+    <div className="flex flex-col  md:flex-row gap-6">
 
     {/* Left (Text) */}
     <div className="flex-1 order-2 md:order-2">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 leading-tight">
+        <h2 className="text-xl md:text-3xl lg:text-5xl font-bold mb-4 md:mb-6 leading-tight">
         สวัสดีครับ! ผม Natthawut Samruamjit
         </h2>
-        <h3>
+        <h3 className="text-sm md:text-base lg:text-lg text-gray-600 leading-relaxed">
             นักศึกษามหาวิทยาลัยเทคโนโลยีสุรนารี <br/>
             สำนักวิชาวิศวกรรมศาสตร์ สาขาวิศวกรรมคอมพิวเตอร์ ปี 4 <br/>
             เกรดเฉลี่ยสะสม 3.38 <br/>
@@ -20,7 +20,7 @@ const Hero = () => (
 
         </h3>
 
-        <p className="text-base md:text-lg text-gray-600 leading-relaxed py-4">
+        <p className="text-sm md:text-base lg:text-lg  text-gray-600 leading-relaxed py-4">
         กำลังมองหาโอกาสฝึกงานเพื่อพัฒนาทักษะและเรียนรู้จากผู้เชี่ยวชาญในวงการ
         มีประสบการณ์ในการพัฒนาโปรเจกต์ด้วยเทคโนโลยีที่ทันสมัย ทั้งด้านเว็บแอปพลิเคชันและงานระบบหลังบ้าน
         สนใจด้าน (AI), (IoT) และ Web Development เป็นพิเศษ
@@ -29,7 +29,7 @@ const Hero = () => (
     </div>
 
     {/* Right (Image) */}
-    <div className="order-1 md:order-1">
+    <div className="order-1  md:order-1">
         <img
         src={Profile}
         alt="Profile"

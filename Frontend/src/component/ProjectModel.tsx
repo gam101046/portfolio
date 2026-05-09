@@ -23,7 +23,7 @@ return (
     onClick={onClose}
     >
     <div
-        className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] shadow-2xl flex flex-col"
+        className="bg-white rounded-lg max-w-md md:max-w-xl lg:max-w-2xl w-full max-h-[90vh] shadow-2xl flex flex-col"
         onClick={(e) => e.stopPropagation()}
     >
         {/* Header Carousel (ใช้ carouselImages) */}

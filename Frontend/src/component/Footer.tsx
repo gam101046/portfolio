@@ -7,7 +7,7 @@ export const Footer = () => (
         <p className="text-gray-600">ติดต่อผมได้ทุกเวลาสำหรับโอกาสฝึกงาน</p>
         </div>
         <a
-        href="mailto:your.email@example.com"
+        href="mailto:natthawut.samruamjit01@gmail.com"
         className="px-8 py-3 bg-black text-white font-medium rounded-full hover:bg-gray-800 transition-colors"
         >
         ติดต่อเลย
